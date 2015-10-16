@@ -110,25 +110,25 @@ void changeFacialSkinColor(Mat smallImgBGR , Mat bigEdges , int debugType)
 	Scalar upperDiff = Scalar(UPPER_Y,UPPER_Cr , UPPER_Cb) ;
 
 	Mat edgeMask = mask.clone() ;
-        for (int i=0; i<NUM_SKIN_POINTS; i++) {
-            // Use the floodFill() mode that stores to an external mask, instead of the input image.
-            const int flags = 4 | FLOODFILL_FIXED_RANGE | FLOODFILL_MASK_ONLY;
-            floodFill(yuv, maskPlusBorder, skinPts[i], Scalar(), NULL, lowerDiff, upperDiff, flags);
-            if (debugType >= 1)
-                circle(smallImgBGR, skinPts[i], 5, CV_RGB(0, 0, 255), 1, CV_AA);
-        }
-        if (debugType >= 2)
-            imshow("flood mask", mask*120); // Draw the edges as white and the skin region as grey.
+    for (int i=0; i<NUM_SKIN_POINTS; i++) {
+        // Use the floodFill() mode that stores to an external mask, instead of the input image.
+        const int flags = 4 | FLOODFILL_FIXED_RANGE | FLOODFILL_MASK_ONLY;
+        floodFill(yuv, maskPlusBorder, skinPts[i], Scalar(), NULL, lowerDiff, upperDiff, flags);
+        if (debugType >= 1)
+            circle(smallImgBGR, skinPts[i], 5, CV_RGB(0, 0, 255), 1, CV_AA);
+    }
+    if (debugType >= 2)
+        imshow("flood mask", mask*120); // Draw the edges as white and the skin region as grey.
 
-        // After the flood fill, "mask" contains both edges and skin pixels, whereas
-        // "edgeMask" just contains edges. So to get just the skin pixels, we can remove the edges from it.
-        mask -= edgeMask;
-        // "mask" now just contains 1's in the skin pixels and 0's for non-skin pixels.
+    // After the flood fill, "mask" contains both edges and skin pixels, whereas
+    // "edgeMask" just contains edges. So to get just the skin pixels, we can remove the edges from it.
+    mask -= edgeMask;
+    // "mask" now just contains 1's in the skin pixels and 0's for non-skin pixels.
 
-        // Change the color of the skin pixels in the given BGR image.
-        int Red = 0;
-        int Green = 70;
-        int Blue = 0;
+    // Change the color of the skin pixels in the given BGR image.
+    int Red = 0;
+    int Green = 70;
+    int Blue = 0;
 
-        add(smallImgBGR, Scalar(Blue, Green, Red), smallImgBGR, mask);
+    add(smallImgBGR, Scalar(Blue, Green, Red), smallImgBGR, mask);
 }
