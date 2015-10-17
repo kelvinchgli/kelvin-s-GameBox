@@ -74,7 +74,6 @@ void changeFacialSkinColor(Mat smallImgBGR , Mat bigEdges , int debugType)
 	size.width = smallImgBGR.cols ;
 	size.height = smallImgBGR.rows ;
 
-
 	Mat yuv = Mat(size , CV_8UC3) ;
 	cvtColor(smallImgBGR , yuv , CV_BGR2YCrCb);
 

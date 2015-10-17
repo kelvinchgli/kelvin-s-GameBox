@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <opencv2/opencv.hpp>
 #include<Windows.h>
+#include <sys/timeb.h>
 
 #include "cartoon.h"
 #include "ImageUtils.h"
@@ -115,11 +116,14 @@ int main(int argc , const char * argv[])
 	camera.set(CV_CAP_PROP_FRAME_WIDTH , DESIRED_CAMERA_WIDTH);
 	camera.set(CV_CAP_PROP_FRAME_HEIGHT , DESIRED_CAMERA_HEIGHT);
 
-	namedWindow(windowName);
+	namedWindow(windowName , WND_PROP_FULLSCREEN);
 
-	while(true)
-	{
-		Mat cameraFrame ;
+	Mat cameraFrame ;
+	Size size(DESIRED_CAMERA_WIDTH , DESIRED_CAMERA_HEIGHT) ;	
+	Mat displayedFrame = Mat(size , CV_8UC3);
+
+	//while(true)
+	//{
 		camera >> cameraFrame ;
 		if(cameraFrame.empty())
 		{
@@ -127,14 +131,34 @@ int main(int argc , const char * argv[])
 			exit(1);
 		}
 
-		Size size(cameraFrame.cols , cameraFrame.rows) ;		
-		Mat displayedFrame = Mat(size , CV_8UC3);
-
 		int debugType = 0 ;
 		if(m_debugMode)
 			debugType = 2 ;
+		
+		struct timeb start , end ;
+		ftime(&start);
 
 		cartoonifyImage(cameraFrame , displayedFrame , m_sketchMode , m_alienMode , m_evilMode , debugType);
+
+		ftime(&end);
+		string mode = "";
+
+		if(m_sketchMode)
+			mode = "sketch";
+		else
+			mode = "paint";
+
+		if(m_alienMode)
+			mode = "alien";
+		else
+			mode = "human";
+
+		if(m_evilMode)
+			mode ="evil";
+		else
+			mode = "good";
+
+		cout<<mode <<" time :" <<(end.millitm-start.millitm) << "ms" <<endl;
 
 		// 在一段时间内，在相机抓取的帧中，叠加脸型轮廓线框
 		if(m_stickFigureIterations > 0)
@@ -144,17 +168,19 @@ int main(int argc , const char * argv[])
 		}
 
 		imshow(windowName , displayedFrame);
-
+		//imshow(windowName , cameraFrame);
+		
 		// waitKey()将延时20ms，相当于调用了sleep(20)，同时，当延时时间到时，会查询是否有按键按下
 		// 因此，waitKey()的返回值是按键的键值，若无按键按下，则返回-1。当延时过程中，若有按键按下，延时将会被打断
 		// waitKey()将提前返回
 		char keypress = waitKey(20);
-		if(keypress == VK_ESCAPE)
-			break ;
+		//if(keypress == VK_ESCAPE)
+		//	break ;
 
 		if(keypress > 0)
 			onKeyPress(keypress);
-	}
+	//}
 
+		system("pause");
 	return EXIT_SUCCESS ;
 }
